@@ -18,6 +18,11 @@ URL:            https://github.com/open-source-parsers/%{name}
 Source0:        %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Group:          Development/Libraries
 
+%if 0%{?rhel} == 7
+%define cmake cmake3
+%endif
+
+
 # Debug packages are automatically handled on RHEL 8+ and Fedora 33+
 %if 0%{?rhel} == 7
 %define debug_package %{nil}
@@ -66,7 +71,7 @@ export LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/
 export CC=/opt/rh/devtoolset-9/root/usr/bin/gcc
 export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
 %endif
-%cmake3                                         \
+%{cmake}                                       \
   -DBUILD_STATIC_LIBS:BOOL=OFF                 \
   -DBUILD_OBJECT_LIBS:BOOL=OFF                 \
   -DJSONCPP_WITH_CMAKE_PACKAGE:BOOL=ON         \
@@ -77,14 +82,35 @@ export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
   -DJSONCPP_WITH_TESTS:BOOL=ON                 \
   -DJSONCPP_WITH_WARNING_AS_ERROR:BOOL=OFF     \
   -DPYTHON_EXECUTABLE:STRING="%{__python3}"
-%cmake_build
 
+
+make %{?_smp_mflags}
 %clean
 rm -rf $RPM_BUILD_ROOT
-
 %install
 rm -rf $RPM_BUILD_ROOT
+%if 0%{?fedora} >= 33
+ln -s . %{_host}
+%endif
+%if 0%{?rhel} >= 9
+ln -s . %{_host}
+ln -s . redhat-linux-build
+%endif
+%if 0%{?fedora} == 35
+ln -s . redhat-linux-build
+%endif
+%if "%{_host}" == "powerpc64le-redhat-linux-gnu"
+ln -s . ppc64le-redhat-linux-gnu
+%endif
+%if "%{_host}" == "s390x-ibm-linux-gnu"
+ln -s . s390x-redhat-linux-gnu
+%endif
+%if "%{cmake}" == "cmake3"
+%cmake3_install
+%else
 %cmake_install
+%endif
+
 
 %check
 # Run tests single threaded.

@@ -67,7 +67,9 @@ This package contains the development headers and library for %{name}.
 %autosetup -p 1
 
 %build
+
 %if 0%{?rhel} == 7
+echo build for RHEL7.
 export PATH=/opt/rh/devtoolset-9/root/usr/bin:$PATH
 export LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/root/usr/lib:$LD_LIBRARY_PATH
 export CC=/opt/rh/devtoolset-9/root/usr/bin/gcc
@@ -84,8 +86,6 @@ export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
   -DJSONCPP_WITH_TESTS:BOOL=ON                 \
   -DJSONCPP_WITH_WARNING_AS_ERROR:BOOL=OFF     \
   -DPYTHON_EXECUTABLE:STRING="%{__python3}"
-
-
 make %{?_smp_mflags}
 %clean
 rm -rf $RPM_BUILD_ROOT

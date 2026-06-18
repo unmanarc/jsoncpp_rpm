@@ -75,7 +75,11 @@ export LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/
 export CC=/opt/rh/devtoolset-9/root/usr/bin/gcc
 export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
 %endif
-%{cmake}                                       \
+
+mkdir -p build
+cd build
+
+%{cmake} ..                                    \
   -DBUILD_STATIC_LIBS:BOOL=OFF                 \
   -DBUILD_OBJECT_LIBS:BOOL=OFF                 \
   -DJSONCPP_WITH_CMAKE_PACKAGE:BOOL=ON         \

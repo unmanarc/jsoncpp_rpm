@@ -1,6 +1,3 @@
-# Build documentation in HTML with images
-%bcond_without jsoncpp_enables_doc
-
 %global jsondir json
 
 # Avoid accidental so-name bumps.
@@ -59,29 +56,8 @@ Requires:       %{name}%{?_isa} = %{version}-%{release}
 %description    devel
 This package contains the development headers and library for %{name}.
 
-
-%if %{with jsoncpp_enables_doc}
-%package        doc
-Summary:        Documentation for %{name}
-
-BuildRequires:  doxygen
-BuildRequires:  graphviz
-BuildRequires:  hardlink
-
-BuildArch:      noarch
-
-%description    doc
-This package contains the documentation for %{name}.
-%endif
-
-
 %prep
 %autosetup -p 1
-%if %{with jsoncpp_enables_doc}
-doxygen -s -u doc/doxyfile.in
-sed -i -e 's!^DOT_FONTNAME.*=.*!DOT_FONTNAME =!g' doc/doxyfile.in
-%endif
-
 
 %build
 %if 0%{?rhel} == 7
@@ -90,7 +66,7 @@ export LD_LIBRARY_PATH=/opt/rh/devtoolset-9/root/usr/lib64:/opt/rh/devtoolset-9/
 export CC=/opt/rh/devtoolset-9/root/usr/bin/gcc
 export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
 %endif
-%cmake                                         \
+%cmake3                                         \
   -DBUILD_STATIC_LIBS:BOOL=OFF                 \
   -DBUILD_OBJECT_LIBS:BOOL=OFF                 \
   -DJSONCPP_WITH_CMAKE_PACKAGE:BOOL=ON         \
@@ -103,32 +79,12 @@ export CXX=/opt/rh/devtoolset-9/root/usr/bin/g++
   -DPYTHON_EXECUTABLE:STRING="%{__python3}"
 %cmake_build
 
-%if %{with jsoncpp_enables_doc}
-# Build the doc
-cp -p %{__cmake_builddir}/version .
-%{__python3} doxybuild.py --with-dot --doxygen /usr/bin/doxygen
-rm -f version
-%endif
-
-
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %install
 rm -rf $RPM_BUILD_ROOT
 %cmake_install
-
-mkdir -p %{buildroot}%{_docdir}/%{name}
-install -pm 0644 README.md %{buildroot}%{_docdir}/%{name}
-
-%if %{with jsoncpp_enables_doc}
-mkdir -p %{buildroot}%{_docdir}/%{name}/html
-cp -a dist/doxygen/jsoncpp-api-html-/* %{buildroot}%{_docdir}/%{name}/html
-find %{buildroot}%{_docdir} -type d -print0 | xargs -0 chmod -c 0755
-find %{buildroot}%{_docdir} -type f -print0 | xargs -0 chmod -c 0644
-hardlink -cfv %{buildroot}%{_docdir}/%{name}
-%endif
-
 
 %check
 # Run tests single threaded.
@@ -141,11 +97,6 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 
 %files
 %license AUTHORS LICENSE
-%doc %dir %{_docdir}/%{name}
-%doc %{_docdir}/%{name}/README.md
-%if %{with jsoncpp_enables_doc}
-%exclude %{_docdir}/%{name}/html
-%endif
 %{_libdir}/lib%{name}.so.%{sover}*
 %{_libdir}/lib%{name}.so.%{version}
 
@@ -157,14 +108,13 @@ hardlink -cfv %{buildroot}%{_docdir}/%{name}
 %{_libdir}/pkgconfig/%{name}.pc
 
 
-%if %{with jsoncpp_enables_doc}
-%files doc
-%license %{_datadir}/licenses/%{name}
-%doc %{_docdir}/%{name}
-%endif
-
 
 %changelog
+* Tue Jun 17 2026 Aaron G. Mizrachi P. <dev@unmanarc.com> - 1.9.8-1
+- Update to version 1.9.8
+- Remove documentation subpackage (doxygen, graphviz, doc files)
+- Use %cmake3 for RHEL 7 compatibility
+
 * Thu Jun 18 2026 Aaron G. Mizrachi P. <dev@unmanarc.com> - 1.9.6-4
 - Add RHEL 7 build support (devtoolset-9, cmake3 conditionals)
 - Add debug_package conditionals for RHEL 7/8+ and Fedora 33+

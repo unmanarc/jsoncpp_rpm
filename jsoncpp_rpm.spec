@@ -93,6 +93,9 @@ cd build
 make %{?_smp_mflags}
 %clean
 rm -rf $RPM_BUILD_ROOT
+
+
+
 %install
 rm -rf $RPM_BUILD_ROOT
 %if 0%{?fedora} >= 33
@@ -111,21 +114,16 @@ ln -s . ppc64le-redhat-linux-gnu
 %if "%{_host}" == "s390x-ibm-linux-gnu"
 ln -s . s390x-redhat-linux-gnu
 %endif
-%if "%{cmake}" == "cmake3"
-%cmake3_install
-%else
-%cmake_install
-%endif
 
+DESTDIR=%{buildroot} %{cmake} --install build
 
 %check
 # Run tests single threaded.
 %global _smp_mflags -j1
-%ctest
-
+cd build
+ctest --output-on-failure -j1
 
 %ldconfig_scriptlets
-
 
 %files
 %license AUTHORS LICENSE

@@ -141,7 +141,7 @@ ln -s . s390x-redhat-linux-gnu
 - Remove documentation subpackage (doxygen, graphviz, doc files)
 - Use %cmake3 for RHEL 7 compatibility
 
-* Thu Jun 18 2026 Aaron G. Mizrachi P. <dev@unmanarc.com> - 1.9.6-4
+* Thu Jun 16 2026 Aaron G. Mizrachi P. <dev@unmanarc.com> - 1.9.6-4
 - Add RHEL 7 build support (devtoolset-9, cmake3 conditionals)
 - Add debug_package conditionals for RHEL 7/8+ and Fedora 33+
 - Add %clean section for RHEL 7 compatibility

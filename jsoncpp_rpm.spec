@@ -18,6 +18,8 @@ URL:            https://github.com/open-source-parsers/%{name}
 Source0:        %{url}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 Group:          Development/Libraries
 
+%define cmake cmake
+
 %if 0%{?rhel} == 7
 %define cmake cmake3
 %endif

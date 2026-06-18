@@ -3,7 +3,7 @@
 # Avoid accidental so-name bumps.
 # ATTENTION!!!  You need to run a bootstrap build
 # of cmake *BEFORE* bumping the sover here!
-%global sover 26
+%global sover 27
 
 # RHEL 7 support
 %define build_timestamp %{lua: print(os.date("%Y%m%d"))}
@@ -22,6 +22,12 @@ Group:          Development/Libraries
 
 %if 0%{?rhel} == 7
 %define cmake cmake3
+%endif
+
+%define ctest ctest
+
+%if 0%{?rhel} == 7
+%define ctest ctest3
 %endif
 
 
@@ -80,6 +86,7 @@ mkdir -p build
 cd build
 
 %{cmake} ..                                    \
+  -DCMAKE_INSTALL_PREFIX:STRING=/usr            \
   -DBUILD_STATIC_LIBS:BOOL=OFF                 \
   -DBUILD_OBJECT_LIBS:BOOL=OFF                 \
   -DJSONCPP_WITH_CMAKE_PACKAGE:BOOL=ON         \
@@ -121,7 +128,7 @@ DESTDIR=%{buildroot} %{cmake} --install build
 # Run tests single threaded.
 %global _smp_mflags -j1
 cd build
-ctest --output-on-failure -j1
+%{ctest} --output-on-failure -j1
 
 %ldconfig_scriptlets
 
